@@ -14,12 +14,13 @@ epachnikov_kernel = lambda k: max(0, 0.75 * (1 - k ** 2))
 
 class MyKNeighborsClassifier(BaseEstimator):
     def __init__(self, n_neighbors, metric='euclidean', kernel='triungular_kernel', is_fixed_window=True,
-                 window_parameter=5, weights=None):
+                 k=5 ,h  = 1.0, weights=None):
         self.nn = NearestNeighbors(n_neighbors=n_neighbors, metric=metric)
         self.n_neighbors = n_neighbors
         self.kernel = kernel
         self.is_fixed_window = is_fixed_window
-        self.window_parameter = window_parameter
+        self.k = k
+        self.h = h
         self.weights = weights
         self.y = None
 
@@ -48,9 +49,9 @@ class MyKNeighborsClassifier(BaseEstimator):
                 if(ignored_index is not  None and ignored_index == index):
                     continue
                 if self.is_fixed_window:
-                    div = self.window_parameter
+                    div = self.h
                 else:
-                    div = distances[0][self.window_parameter + 1]
+                    div = distances[0][self.k + 1]
                 arr[self.y.iloc[index]] += self.kernel(dist / div) * self.weights[index]
             res.append(np.argmax(arr))
         return res
